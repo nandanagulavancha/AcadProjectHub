@@ -1,0 +1,343 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ 
+
+ <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details</title>
+    <style>
+     body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+     }
+ 
+
+     .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 80%;
+        max-width: 800px;
+     }
+ 
+
+     h1 {
+        color: #333;
+        text-align: center;
+     }
+ 
+
+     .project-info {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+     }
+ 
+
+     .project-info strong {
+        font-weight: bold;
+        color: #555;
+     }
+ 
+
+     .team-members {
+        margin-top: 20px;
+     }
+ 
+
+     .team-members h2 {
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+     }
+ 
+
+     .team-member {
+        padding: 10px;
+        border: 1px solid #eee;
+        margin-bottom: 10px;
+        border-radius: 4px;
+     }
+ 
+
+     .media-container {
+        margin-top: 20px;
+     }
+ 
+
+     .media-container h2 {
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+     }
+ 
+
+     .image-scroll {
+        display: flex;
+        overflow-x: auto;
+        width: 100%;
+        padding-bottom: 10px;
+     }
+ 
+
+     .image-scroll img {
+        max-height: 200px;
+        margin-right: 10px;
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+     }
+ 
+
+     .image-scroll img:hover {
+        transform: scale(1.1);
+     }
+ 
+
+     .image-scroll img.expanded {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+        transform: scale(1);
+        max-height: none;
+     }
+ 
+
+     .uploaded-video {
+        max-width: 100%;
+        margin-bottom: 10px;
+     }
+ 
+
+     .zip-file-info {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: 4px;
+     }
+ 
+
+     .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #5cb85c;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+     }
+ 
+
+     .back-link:hover {
+        background-color: #4cae4c;
+     }
+ 
+
+     /* The Modal (background) */
+     .modal {
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        /* Stay in place */
+        z-index: 1;
+        /* Sit on top */
+        padding-top: 50px;
+        /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%;
+        /* Full width */
+        height: 100%;
+        /* Full height */
+        overflow: auto;
+        /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0);
+        /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.9);
+        /* Black w/ opacity */
+     }
+ 
+
+     /* Modal Content (image) */
+     .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 80%;
+        max-height: 80%;
+     }
+ 
+
+     /* The Close Button */
+     .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+     }
+ 
+
+     .close:hover,
+     .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+     }
+    </style>
+ </head>
+ 
+
+ <body>
+    <div class="container">
+     <h1>Project Details</h1>
+ 
+
+     {% if project %}
+     <div class="project-info">
+        <strong>Title:</strong> {{ project.title }}
+     </div>
+     <div class="project-info">
+        <strong>Description:</strong> {{ project.description }}
+     </div>
+     <div class="project-info">
+        <strong>Category:</strong> {{ project.category }}
+     </div>
+     <div class="project-info">
+        <strong>Guide Name:</strong> {{ project.guide_name }}
+     </div>
+     {% if project.github_link %}
+     <div class="project-info">
+        <strong>GitHub Link:</strong> <a href="{{ project.github_link }}" target="_blank">{{ project.github_link }}</a>
+     </div>
+     {% endif %}
+     {% if project.drive_link %}
+     <div class="project-info">
+        <strong>Drive Link:</strong> <a href="{{ project.drive_link }}" target="_blank">{{ project.drive_link }}</a>
+     </div>
+     {% endif %}
+ 
+
+     {% if project.team_members %}
+     <div class="team-members">
+        <h2>Team Members</h2>
+        {% for member in project.team_members %}
+        <div class="team-member">
+         <strong>Name:</strong> {{ member.name }}, <strong>Roll No:</strong> {{ member.roll_no }}
+        </div>
+        {% endfor %}
+     </div>
+     {% endif %}
+     <div class="submissions-section">
+      <h2 class="submissions-title">Submissions</h2>
+      {% if submissions %}
+          
+              <div class = "submission-block">
+                   <p>
+                      <strong>Marks:</strong> 
+                      {% if submissions.marks is not none %}
+                      {% for roll_no, mark in submissions.marks.items() %}
+                      <li><strong>{{roll_no}}</strong>: {{mark}}</li>
+                    {% endfor %}
+                      {% else %}
+                          Not Graded Yet
+                      {% endif %}
+                  </p>
+                  {% if submissions.student_feedback %}
+                      <p><strong>Feedback:</strong> </p>
+                      <ul>
+                      {% for roll_no, feedback in submissions.student_feedback.items() %}
+                        <li><strong>{{roll_no}}</strong>: {{feedback}}</li>
+                      {% endfor %}
+                      </ul>
+                  {% endif %}
+              </div>
+          <div>
+              <p><strong>Team Feedback:</strong> </p>{{ submissions.overall_feedback }}
+          </div>
+      {% else %}
+          <p>No submissions found for this project.</p>
+      {% endif %}
+  </div>
+
+     {% if project.screenshot_ids %}
+     <div class="media-container">
+        <h2>Screenshots/Videos</h2>
+        <div class="image-scroll">
+         {% for filepath in project.screenshot_ids %}
+         {% set filename = filepath.split('/')[-1] %}
+         {% if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+         <img src="{{ url_for('student.get_student_upload', filename=filename) }}" alt="Screenshot"
+            onclick="openModal(this)">
+         {% elif filename.lower().endswith(('.mp4', '.mov')) %}
+         <video src="{{ url_for('student.get_student_upload', filename=filename) }}" controls
+            class="uploaded-video"></video>
+         {% else %}
+         <p>Unsupported media type: {{ filename }}</p>
+         {% endif %}
+         {% endfor %}
+        </div>
+     </div>
+     {% endif %}
+ 
+
+     {% if project.zip_file_id %}
+     <div class="zip-file-info">
+        <strong>ZIP File:</strong> {{ project.zip_file_id.split('/')[-1] }}
+        <small>(Download not implemented here)</small>
+     </div>
+     {% endif %}
+ 
+
+     {% else %}
+     <p>Project not found.</p>
+     {% endif %}
+ 
+
+     <a href="{{ url_for('student.dashboard') }}" class="back-link">Back to Dashboard</a>
+    </div>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+     <span class="close" onclick="closeModal()">&times;</span>
+     <img class="modal-content" id="img01">
+    </div>
+ 
+
+    <script>
+     // Get the modal
+     var modal = document.getElementById("myModal");
+ 
+
+     // Function to open the modal
+     function openModal(img) {
+      modal.style.display = "block";
+      var modalImg = document.getElementById("img01");
+      modalImg.src = img.src;
+     }
+ 
+
+     // Function to close the modal
+     function closeModal() {
+      modal.style.display = "none";
+     }
+    </script>
+ </body>
+ 
+
+ </html>

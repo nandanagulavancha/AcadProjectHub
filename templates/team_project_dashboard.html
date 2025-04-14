@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Project Dashboard: {{ team.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 70px; /* Adjust for fixed navbar */
+        }
+        .navbar {
+            background-color: #343a40 !important; /* Dark background for navbar */
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        .navbar-brand, .nav-link {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: white !important;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .dashboard-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .team-name-header {
+            color: #343a40;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #343a40;
+            padding-bottom: 10px;
+        }
+        .team-members-section {
+            margin-bottom: 20px;
+        }
+        .team-members-title {
+            color: #343a40;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #343a40;
+            padding-bottom: 5px;
+        }
+        .team-member-card {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+        .submissions-section {
+            margin-top: 20px;
+        }
+        .submissions-title {
+            color: #343a40;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #343a40;
+            padding-bottom: 5px;
+        }
+        .submission-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+        .submission-table thead th {
+            background-color: #e9ecef;
+            color: #343a40;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .submission-table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        .submission-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .submission-table tbody tr:hover {
+            background-color: #d4edda;
+        }
+        .submission-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .submission-actions a {
+            text-decoration: none;
+            color: #0078d7;
+        }
+        .submission-actions a:hover {
+            color: #0056b3;
+        }
+        .marks-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+        }
+        .no-submissions-message {
+            font-style: italic;
+            color: #6c757d;
+        }
+        .project-progress-section {
+            margin-top: 20px;
+        }
+        .project-progress-title {
+            color: #343a40;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #343a40;
+            padding-bottom: 5px;
+        }
+        .faculty-tools-section {
+            margin-top: 20px;
+        }
+        .faculty-tools-title {
+            color: #343a40;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #343a40;
+            padding-bottom: 5px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0078d7;
+            text-decoration: none;
+            padding: 10px 15px;
+            border: 1px solid #0078d7;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .back-link:hover {
+            background-color: #0078d7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Team Project Dashboard</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('faculty.dashboard') }}">Faculty Dashboard</a>
+                    </li>
+                    </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <h1 class="team-name-header">{{ team.name }} - Project Dashboard</h1>
+
+            <div class="team-members-section">
+                <h2 class="team-members-title">Team Members</h2>
+                {% if leaders %}
+                    {% for leader in leaders %}
+                        <div class="team-member-card">
+                            <strong>Name:</strong> {{ leader.name }} ({{ leader.roll_no }})
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No team members found.</p>
+                {% endif %}
+            </div>
+
+            <div class="submissions-section">
+                <h2 class="submissions-title">Submissions</h2>
+                {% if submissions %}
+                    <table class="submission-table">
+                        <thead>
+                            <tr>
+                                <th>Submission Date</th>
+                                <th>Submitted By</th>
+                                <th>Actions</th>
+                                <th>Marks</th>
+                                 <th>Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                                <tr>
+                                    <td>{{ submission.date }}</td>
+                                    <td>{{ submission.submitted_by }}</td>
+                                    <td class="submission-actions">
+                                        <a href="{{ url_for('faculty.view_submission', team_id=team._id, submission_id=submission._id) }}">View</a>
+                                        |
+                                        <a href="{{ url_for('faculty.give_marks', team_id=team._id, submission_id=submission._id) }}">Give Marks</a>
+                                    </td>
+                                    <td>
+                                        {% if submission.marks %}
+                                            <span class="marks-badge">{{ submission.marks }}</span>
+                                        {% else %}
+                                            Not Graded
+                                        {% endif %}
+                                    </td>
+                                     <td>{{ submission.feedback }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-submissions-message">No submissions yet.</p>
+                {% endif %}
+            </div>
+
+            <div class="project-progress-section">
+                <h2 class="project-progress-title">Project Progress</h2>
+                <p> \[Display project progress here, if available] </p>
+            </div>
+
+            <div class="faculty-tools-section">
+                <h2 class="faculty-tools-title">Faculty Tools</h2>
+                <p> \[Add any tools for faculty to interact with the project, e.g., chat, feedback forms] </p>
+            </div>
+
+            <a href="{{ url_for('faculty.dashboard') }}" class="back-link">Back to Faculty Dashboard</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-bottom: 3px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 20px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+
+        ul li:hover {
+            background-color: #f9f9f9;
+        }
+
+        .template-item a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #3498db;
+            background-color: white;
+        }
+
+        .template-item a:hover {
+            text-decoration: none;
+            color: #fff;
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+        }
+
+        .marks-table th,
+        .marks-table td {
+            border: 1px solid #ddd;
+            padding: 15px 20px;
+            text-align: left;
+        }
+
+        .marks-table th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .marks-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .submission-status {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            text-align: center;
+            border-radius: 10px;
+            background-color: #e8f0fe;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin-top: 30px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 18px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .dashboard-section {
+            margin-bottom: 40px;
+        }
+
+        .no-data {
+            font-style: italic;
+            color: #777;
+        }
+
+        .project-details {
+            margin-top: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .project-details p {
+            margin-bottom: 10px;
+        }
+
+        .project-details strong {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        /* New styles for logout button */
+        .logout-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Style adjustments for even better presentation */
+        body {
+            background-color: #ecf0f1;
+        }
+
+        .container {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            color: #2980b9;
+        }
+
+        h2 {
+            color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+
+    
+    <div class="container">
+        <h1>Student Dashboard</h1>
+        <a class="logout-button" href="/auth/logout">Logout</a>
+
+        <div class="dashboard-section">
+            <h2>Deadlines</h2>
+            {% if deadlines %}
+            <ul>
+                {% for deadline in deadlines %}
+                <li>{{ deadline.title }} - {{ deadline.date }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-data">No deadlines available.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Project Templates</h2>
+            {% if templates %}
+            <ul>
+                {% for template in templates %}
+                <li class="template-item">
+                    {{ template.filename }}
+                    <a href="{{ url_for('faculty.download_template', file_id=template._id) }}">Download</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-data">No templates available.</p>
+            {% endif %}
+        </div>
+        <div class="submissions-section">
+            <h2 class="submissions-title">Marks and Feedback</h2>
+            {% if submissions %}
+                
+                    <div class = "submission-block">
+                         <p>
+                            <strong>Marks:</strong> 
+                            {% if submissions.marks is not none %}
+                            {% for roll_no, mark in submissions.marks.items() %}
+                            <li><strong>{{roll_no}}</strong>: {{mark}}</li>
+                          {% endfor %}
+                            {% else %}
+                                Not Graded Yet
+                            {% endif %}
+                        </p>
+                        {% if submissions.student_feedback %}
+                            <p><strong>Feedback:</strong> </p>
+                            <ul>
+                            {% for roll_no, feedback in submissions.student_feedback.items() %}
+                              <li><strong>{{roll_no}}</strong>: {{feedback}}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                <div>
+                    <p><strong>Team Feedback:</strong> </p>{{ submissions.overall_feedback }}
+                </div>
+            {% else %}
+                <p>No submissions found for this project.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Submission Status</h2>
+            <div class="submission-status">
+                Status: {{ submission_status }}
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Your Project</h2>
+            {% if project %}
+            <div class="project-details">
+                <p>You have submitted a project: <strong>{{ project.title }}</strong></p>
+                <p><a href="{{ url_for('student.project_details', project_id=project._id) }}"
+                        class="submit-button">View Project Details</a></p>
+            </div>
+            {% else %}
+            <p class="no-data">You have not submitted a project yet.</p>
+            {% endif %}
+        </div>
+        <div>
+        <a href="{{ url_for('student.project_submission') }}" class="submit-button">
+            {% if submission_status == "Submitted" %}
+            Edit Submission
+            {% else %}
+            Submit Project
+            {% endif %}
+        </a>
+    </div>
+    </div>
+</body>
+
+</html>
