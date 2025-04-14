@@ -100,4 +100,6 @@ You can find the project repository here: [https://github.com/nandanagulavancha/
 3.  Submit your projects before the deadline.
 4.  Download template files.
 
-**Note:** This application requires MongoDB to be installed and running on your system. Please ensure MongoDB is set up before running the application.
+**Note:**
+* This application requires MongoDB to be installed and running on your system. Please ensure MongoDB is set up before running the application.
+* You can access the login page at the following URL after running the application: [http://127.0.0.1:5000/auth/login](http://127.0.0.1:5000/auth/login)
