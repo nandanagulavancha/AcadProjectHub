@@ -73,7 +73,7 @@ You can find the project repository here: [https://github.com/nandanagulavancha/
 
 6.  **Run the application:**
     ```bash
-    flask run
+    python backend/app.py
     ```
     The application will automatically create a default admin user on the first run. The username is "admin", the email is "admin1@example.com", and the password is "admin". You should change this password immediately after logging in.
 
@@ -100,19 +100,4 @@ You can find the project repository here: [https://github.com/nandanagulavancha/
 3.  Submit your projects before the deadline.
 4.  Download template files.
 
-## Directory Structure
-
-├── app.py          # Main application file
-├── database.py     # MongoDB connection
-├── models.py       # Data models
-├── routes
-│   ├── admin.py    # Admin routes
-│   ├── faculty.py  # Faculty routes
-│   ├── student.py  # Student routes
-│   └── auth.py     # Authentication routes
-├── templates       # HTML templates
-├── uploads         # Directory for uploaded files
-├── venv            # Virtual environment (optional)
-├── requirements.txt # Project dependencies
-└── README.md       # Project documentation
-
+**Note:** This application requires MongoDB to be installed and running on your system. Please ensure MongoDB is set up before running the application.
