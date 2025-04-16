@@ -202,11 +202,13 @@ def dashboard():
     student_marks = {}
     submission_status = "Not Submitted"  # Default status
     submissions = []
+    announcements = []
     print(current_user.id,submission_status)
     if teams:
         faculty_id = teams[0]['faculty_id']  # Assuming all teams are under the same faculty
         deadlines = Deadline.get_all(faculty_id)
         templates = TemplateFile.get_all(faculty_id)
+        announcements = Announcement.get_all(faculty_id)
         # print(TeamLeader.get(current_user.id))
         # Get project submission status
         # project = None
@@ -225,7 +227,8 @@ def dashboard():
         student_marks=student_marks,
         submission_status=submission_status,
         project=project,
-        submissions=submissions
+        submissions=submissions,
+        announcements=announcements
     )
 
 @student_bp.route('/project-submission', methods=['GET', 'POST'])

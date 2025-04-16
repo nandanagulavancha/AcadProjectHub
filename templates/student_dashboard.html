@@ -208,6 +208,22 @@
         <a class="logout-button" href="/auth/logout">Logout</a>
 
         <div class="dashboard-section">
+            <h2>Announcements</h2>
+            {% if announcements %}
+            <ul>
+                {% for announcement in announcements %}
+                <li class="announcement-item">
+                    <h4>{{ announcement.title }}</h4>
+                    <p>{{ announcement.content }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-data">No announcements yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
             <h2>Deadlines</h2>
             {% if deadlines %}
             <ul>
