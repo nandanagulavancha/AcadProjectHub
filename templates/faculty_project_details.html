@@ -9,17 +9,7 @@
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
-            padding-top: 70px;
-        }
-        .navbar {
-            background-color: #343a40 !important;
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-        .navbar-brand, .nav-link {
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-        .navbar-brand:hover, .nav-link:hover {
-            color: white !important;
+            padding-top: 20px; /* Reduced padding to accommodate buttons */
         }
         .container {
             margin-top: 20px;
@@ -257,24 +247,11 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Faculty Dashboard</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/faculty/dashboard">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/auth/logout">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="container">
+        <div class="d-flex justify-content-between">
+            <a href="/faculty/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="/auth/logout" class="btn btn-danger">Logout</a>
+        </div>
         <div class="project-details-container">
             <h1 class="project-title">Project Details</h1>
 
@@ -316,7 +293,7 @@
                 </div>
 
                 <div class="submissions-section">
-                    <h2 class="submissions-title">Submissions</h2>
+                    <h2 class="submissions-title">Marks</h2>
                     {% if submissions %}
                         
                             <div class = "submission-block">
@@ -343,7 +320,7 @@
                             <p><strong>Team Feedback:</strong> </p>{{ submissions.overall_feedback }}
                         </div>
                     {% else %}
-                        <p>No submissions found for this project.</p>
+                        <p>No Marks found for this project.</p>
                     {% endif %}
                 </div>
 

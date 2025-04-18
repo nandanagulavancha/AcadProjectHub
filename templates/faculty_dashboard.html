@@ -5,83 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            padding-top: 70px;
-        }
-        .navbar {
-            background-color: #343a40 !important;
-        }
-        .navbar-brand, .nav-link {
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-        .navbar-brand:hover, .nav-link:hover {
-            color: white !important;
+            background-color: #f4f6f9;
+            padding-top: 20px;
         }
         .container {
             margin-top: 20px;
         }
         .dashboard-item {
             background-color: #fff;
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s ease;
+        }
+        .dashboard-item:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
         }
         .dashboard-item h2 {
-            color: #343a40;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #343a40;
-            padding-bottom: 5px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #eee;
+            padding-bottom: 10px;
         }
         .list-group-item {
             border: none;
-            padding: 10px 0;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .list-group-item:last-child {
+            border-bottom: none;
         }
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
+            padding: 12px 25px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
         }
         .btn-primary:hover {
             background-color: #0056b3;
             border-color: #0056b3;
         }
+        .table thead th {
+            background-color: #e9ecef;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .table th, .table td {
+            padding: 15px;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+        }
+        .table tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .form-control {
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
         footer {
             text-align: center;
-            padding: 10px;
+            padding: 20px;
             background-color: #343a40;
             color: rgba(255, 255, 255, 0.7);
             position: fixed;
             bottom: 0;
             width: 100%;
         }
+        /* Additional styling for icons */
+        .icon-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Faculty Dashboard</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/auth/logout">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    <div class = "container">
+        <h1>Faculty Dashboard</h1>
+    </div>
 
     <div class="container">
         <div class="dashboard-item">
             <h2>Teams</h2>
-            <a class="btn btn-primary mb-3" href="{{ url_for('faculty.create_team_and_leaders') }}">Create New Team</a>
+            <a class="btn btn-primary mb-3" href="{{ url_for('faculty.create_team_and_leaders') }}">
+                <i class="fas fa-plus mr-2"></i>Create New Team
+            </a>
             {% if teams %}
             <h4 class="mt-3 font-weight-bold">Teams List</h4>
             <div class="table-responsive">
@@ -104,7 +132,11 @@
                                 No Leader Assigned
                             {% endif %}
                         </td>
-                        <td><a class="text-danger" href="{{ url_for('faculty.delete_team', team_id=team._id) }}">Delete</a></td>
+                        <td>
+                            <a class="text-danger icon-link" href="{{ url_for('faculty.delete_team', team_id=team._id) }}">
+                                <i class="fas fa-trash-alt mr-1"></i>Delete
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -122,7 +154,9 @@
                 <div class="form-group">
                     <input type="date" class="form-control" name="date" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Deadline</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus mr-2"></i>Add Deadline
+                </button>
             </form>
             {% if deadlines %}
                 <h4 class="mt-3 font-weight-bold">Current Deadlines</h4>
@@ -151,7 +185,9 @@
                 <div class="form-group">
                     <input type="file" name="file" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Upload File</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-upload mr-2"></i>Upload File
+                </button>
             </form>
             {% if templates %}
                 <h4 class="mt-3 font-weight-bold">Uploaded Templates</h4>
@@ -167,8 +203,8 @@
                             <tr>
                                 <td>{{ template.filename }}</td>
                                 <td>
-                                    <a href="{{ url_for('faculty.download_template', file_id=template._id) }}">Download</a> -
-                                    <a class="text-danger" href="{{ url_for('faculty.delete_template', file_id=template._id) }}">Delete</a>
+                                    <a href="{{ url_for('faculty.download_template', file_id=template._id) }}"><i class="fas fa-download mr-1"></i>Download</a> -
+                                    <a class="text-danger" href="{{ url_for('faculty.delete_template', file_id=template._id) }}"><i class="fas fa-trash-alt mr-1"></i>Delete</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -186,7 +222,9 @@
                 <div class="form-group">
                     <textarea class="form-control" name="content" placeholder="Announcement Content" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Announcement</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus mr-2"></i>Add Announcement
+                </button>
             </form>
             {% if announcements %}
                 <h4 class="mt-3 font-weight-bold">Current Announcements</h4>
@@ -209,8 +247,13 @@
             {% endif %}
         </div>
     </div>
+    <div class="container">
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+    </div>
 
-    
 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

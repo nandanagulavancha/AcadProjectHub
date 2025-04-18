@@ -511,7 +511,7 @@ class Project:
     def create(title, description, team_lead_roll_no, team_lead_name, team_members, category, guide_name, github_link, drive_link, zip_file_id, screenshot_ids):
         project = mongo.db.projects.insert_one({
             'title': title,
-            'description': description,
+            'description': str(description),
             'team_lead_roll_no': team_lead_roll_no,
             'team_lead_name': team_lead_name,
             'team_members': team_members,  # Store list of members
