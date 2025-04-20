@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 from database import mongo
 from pymongo import MongoClient
 from flask_login import login_required, current_user
-from models import Deadline, TemplateFile, Announcement, Team, TeamLeader, Submission, Project
+from models import Deadline, TemplateFile, Announcement, Team, TeamLeader, Submission, Project, generate_temporary_password, User
 from werkzeug.utils import secure_filename
 
 faculty_bp = Blueprint('faculty', __name__)
@@ -27,6 +27,7 @@ def allowed_file(filename):
 @faculty_bp.route('/dashboard')
 @login_required
 def dashboard():
+    faculty = User.get(current_user.id)
     teams = Team.get_all(current_user.id)
     t = {}
     for team in teams:
@@ -36,7 +37,7 @@ def dashboard():
     templates = TemplateFile.get_all(current_user.id)
     announcements = Announcement.get_all(current_user.id)
     announcements.reverse()
-    return render_template('faculty_dashboard.html', teams=teams, deadlines=deadlines, templates=templates, announcements=announcements, t=t)
+    return render_template('faculty_dashboard.html', teams=teams, deadlines=deadlines, templates=templates, announcements=announcements, t=t,faculty=faculty)
 
 
 @faculty_bp.route('/create_team_and_leaders', methods=['GET', 'POST'])
@@ -51,16 +52,19 @@ def create_team_and_leaders():
         section = request.form['section_1']
         email = request.form['email_1']
         username = request.form['username_1']  # Added
-        password = request.form['password_1']  # Added
-        x = TeamLeader.create(roll_no, leader_name, branch, section, email,username, password)
-        
 
-        Team.create(name,x, current_user.id,roll_no)
-        
+        # Generate a temporary password
+        temp_password = generate_temporary_password()
 
-        flash('Team and leader created', 'success')
-        return redirect(url_for('faculty.dashboard'))
- 
+        # Create the TeamLeader
+        team_leader_id = TeamLeader.create(roll_no, leader_name, branch, section, email, username, temp_password)
+
+        if team_leader_id:
+            Team.create(name, team_leader_id, current_user.id, roll_no)
+            flash(f'Team "{name}" and leader "{leader_name}" created. Credentials sent to {email}.', 'success')
+            return redirect(url_for('faculty.dashboard'))
+        else:
+            flash('Error creating team leader.', 'danger')
 
     return render_template('create_team_and_leaders.html')
 
@@ -74,7 +78,7 @@ def delete_team(team_id):
         return redirect(url_for('faculty.dashboard'))
     submissions = Submission.get_by_team_id(team_id)
     if submissions:
-        Submission.delete(submissions['_id']) 
+        Submission.delete(submissions['_id'])
     TeamLeader.delete(team['team_lead'])
     project = Project.get_by_team_lead_roll_no(team['team_lead_roll'])
     if project:
@@ -265,9 +269,9 @@ def download_template(file_id):
 @faculty_bp.route('/delete_template/<file_id>')
 @login_required
 def delete_template(file_id):
-    
+
     file_data = mongo["template_files"].find_one({'_id': ObjectId(file_id)})
-    print(f"delete_template called with file_id: {file_data}, type: {type(file_data)}") 
+    print(f"delete_template called with file_id: {file_data}, type: {type(file_data)}")
     if file_data:
         filepath = file_data['filepath']
         if os.path.exists(filepath):
@@ -312,4 +316,3 @@ def download_zip(zip_file_id):
     else:
         flash('Project record not found.', 'error')
         return redirect(url_for('faculty.dashboard'))  # Or appropriate faculty route
-

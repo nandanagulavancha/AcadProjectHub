@@ -1,7 +1,6 @@
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
-from models import User, Team, Announcement, TemplateFile, Deadline  # Import the relevant models
+from models import User, Team, Announcement, TemplateFile, Deadline, generate_temporary_password  # Import the relevant models and password generator
 from database import mongo  # Import your MongoDB connection
 
 admin_bp = Blueprint('admin', __name__)
@@ -19,10 +18,13 @@ def create_faculty():
         name = request.form['name']  # Get the faculty name
         username = request.form['username']
         email = request.form['email']
-        password = request.form['password']
         faculty_roll_no = request.form['faculty_roll_no'] # get faculty roll no
-        User.create(username, email, password, 'faculty', name=name, faculty_roll_no=faculty_roll_no) # Pass the name and faculty_roll_no
-        flash('Faculty account created', 'success')
+
+        # Generate a temporary password
+        temp_password = generate_temporary_password()
+
+        User.create(username=username, email=email, password=temp_password, role='faculty', name=name, faculty_roll_no=faculty_roll_no) # Pass the name and faculty_roll_no
+        flash(f'Faculty account for {name} created. Credentials sent to {email}.', 'success')
         return redirect(url_for('admin.dashboard'))
     return render_template('create_faculty.html')
 
@@ -45,8 +47,8 @@ def delete_faculty():
             flash('Cannot reassign students to the same faculty being deleted.', 'error')
             return render_template('delete_faculty.html', faculty_users=faculty_users)
 
-        # 1. Reassign students in teams to the new faculty
-        teams_to_update = Team.get_all(faculty_id_to_delete)  
+        # 1. Reassign teams to the new faculty
+        teams_to_update = Team.get_all(faculty_id_to_delete)
         # get teams by faculty id
         print(teams_to_update)
         for team in teams_to_update:
@@ -54,7 +56,6 @@ def delete_faculty():
             Team.update_faculty_id(team['_id'], new_faculty_id)
 
         # 2. Delete announcements, template files, and deadlines
-        
         Announcement.delete_by_faculty_id(faculty_id_to_delete)
         TemplateFile.delete_by_faculty_id(faculty_id_to_delete)
         Deadline.delete_by_faculty_id(faculty_id_to_delete)
@@ -62,7 +63,7 @@ def delete_faculty():
         # 3. Delete the faculty user
         User.delete(faculty_id_to_delete)
 
-        flash('Faculty deleted and students reassigned.', 'success')
+        flash('Faculty deleted and teams reassigned.', 'success')
         return redirect(url_for('admin.dashboard'))
     return render_template('delete_faculty.html',  faculty_users=faculty_users)
 

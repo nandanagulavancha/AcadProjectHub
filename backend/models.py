@@ -3,118 +3,104 @@ from database import mongo
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
 
-# class User(UserMixin):
-#     def __init__(self, username, email, password, role, id=None):
-#         self.username = username
-#         self.email = email
-#         self.password = password
-#         self.role = role
-#         self.id = id
+import csv
+import jinja2
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from flask import current_app  # To access Flask app configurations
+from flask_login import UserMixin
+from database import mongo
+from werkzeug.security import generate_password_hash, check_password_hash
+from bson.objectid import ObjectId
+import secrets
+import string
+import os
 
-#     def get_id(self):
-#         return str(self.id)
+def generate_temporary_password(length=12):
+    alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for i in range(length))
 
+def send_credentials_email(to_email, username, password, role):
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = current_app.config['MAIL_DEFAULT_SENDER'] # Get sender from Flask config
+        msg['To'] = to_email
+        msg['Subject'] = f'Your {role.capitalize()} Account Credentials for ProjectEduHub'
+
+        body = f"""
+        Hello {username},
+
+        Your {role.capitalize()} account has been created on AcadProjectHub with the following credentials:
+
+        Username: {username}
+        Password: {password}
+
+        Please log in to https://rdsj78xb-3000.inc1.devtunnels.ms/auth/login and change your password as soon as possible for security reasons.
+
+        Thank you,
+        The ProjectEduHub Team
+        """
+        msg.attach(MIMEText(body, 'plain'))
+
+        with smtplib.SMTP(current_app.config['MAIL_SERVER'], current_app.config['MAIL_PORT']) as server:
+            server.starttls()
+            server.login(current_app.config['MAIL_USERNAME'], current_app.config['MAIL_PASSWORD'])
+            server.sendmail(current_app.config['MAIL_DEFAULT_SENDER'], to_email, msg.as_string())
+        print(f"Credentials email sent to {to_email} for {role}")
+
+    except Exception as e:
+        print(f"Error sending credentials email to {to_email} for {role}: {e}")
+
+
+# from database import mongo
+# from bson.objectid import ObjectId
+
+# class Team:
+#     @staticmethod
+#     def create(name,team_lead_id, faculty_id,leader_roll_no):
+#         return mongo.db.teams.insert_one({'name': name,'team_lead':team_lead_id, 'faculty_id': ObjectId(faculty_id),'team_lead_roll':leader_roll_no}).inserted_id
 
 #     @staticmethod
-#     def get(identifier):
-#         try:
-#             if isinstance(identifier, str):
-#                 # Check if the identifier is a valid ObjectId
-#                 if ObjectId.is_valid(identifier):
-#                     user_data = mongo.db.users.find_one({'_id': ObjectId(identifier)})
-#                 else:
-#                     user_data = mongo.db.users.find_one({'username': identifier})
-#             else:
-#                 user_data = mongo.db.users.find_one({'username': identifier})
-
-#             if user_data:
-#                 return User(
-#                     username=user_data['username'],
-#                     email=user_data['email'],
-#                     password=user_data['password'],
-#                     role=user_data['role'],
-#                     id=user_data['_id']
-#                 )
-#         except Exception as e:
-#             print(f"Error in User.get: {e}")
-#         return None
-#     @staticmethod
-#     def create(username, email, password, role):
-#         hashed_password = generate_password_hash(password)
-#         result = mongo.db.users.insert_one({
-#             'username': username,
-#             'email': email,
-#             'password': hashed_password,
-#             'role': role
-#         })
-#         return str(result.inserted_id)
+#     def get_all(faculty_id):
+#         teams = list(mongo.db.teams.find({'faculty_id': ObjectId(faculty_id)}))
+#         for team in teams:
+#             team['_id'] = str(team['_id'])
+#         return teams
 
 #     @staticmethod
-#     def get_all_faculty():
-#         faculty_users = list(mongo.db.users.find({'role': 'faculty'}))
-#         for faculty in faculty_users:
-#             faculty['_id'] = str(faculty['_id'])
-#         return faculty_users
+#     def get(team_id):
+#         team = mongo.db.teams.find_one({'_id': ObjectId(team_id)})
+#         if team:
+#             team['_id'] = str(team['_id'])
+#         return team
 
 #     @staticmethod
-#     def delete(user_id):
-#         mongo.db.users.delete_one({'_id': ObjectId(user_id)})
+#     def update_faculty_id(team_id, new_faculty_id):
+#         """
+#         Updates the faculty_id for a given team.
 
-#     @staticmethod
-#     def update_student_faculty(old_faculty_id, new_faculty_id):
-#         mongo.db.students.update_many(
-#             {'faculty_id': ObjectId(old_faculty_id)},
-#             {'$set': {'faculty_id': ObjectId(new_faculty_id)}}
+#         Args:
+#             team_id (str): The ID of the team to update.
+#             new_faculty_id (str): The new faculty ID.
+#         """
+#         print(f"Updating faculty_id for team {team_id} to {new_faculty_id}")
+#         mongo.db.teams.update_one(
+#             {"_id": ObjectId(team_id)},  # Filter by team ID
+#             {"$set": {"faculty_id": new_faculty_id}}  # Set the new faculty ID
 #         )
 
-from database import mongo
-from bson.objectid import ObjectId
+#     @staticmethod
+#     def delete(team_id):
+#         mongo.db.team_leaders.delete_many({'team_id': ObjectId(team_id)})
+#         mongo.db.submissions.delete_many({'team_id': ObjectId(team_id)})
+#         mongo.db.teams.delete_one({'_id': ObjectId(team_id)})
 
-class Team:
-    @staticmethod
-    def create(name,team_lead_id, faculty_id,leader_roll_no):
-        return mongo.db.teams.insert_one({'name': name,'team_lead':team_lead_id, 'faculty_id': ObjectId(faculty_id),'team_lead_roll':leader_roll_no}).inserted_id
-
-    @staticmethod
-    def get_all(faculty_id):
-        teams = list(mongo.db.teams.find({'faculty_id': ObjectId(faculty_id)}))
-        for team in teams:
-            team['_id'] = str(team['_id'])
-        return teams
-
-    @staticmethod
-    def get(team_id):
-        team = mongo.db.teams.find_one({'_id': ObjectId(team_id)})
-        if team:
-            team['_id'] = str(team['_id'])
-        return team
-
-    @staticmethod
-    def update_faculty_id(team_id, new_faculty_id):
-        """
-        Updates the faculty_id for a given team.
-
-        Args:
-            team_id (str): The ID of the team to update.
-            new_faculty_id (str): The new faculty ID.
-        """
-        print(f"Updating faculty_id for team {team_id} to {new_faculty_id}")
-        mongo.db.teams.update_one(
-            {"_id": ObjectId(team_id)},  # Filter by team ID
-            {"$set": {"faculty_id": new_faculty_id}}  # Set the new faculty ID
-        )
-
-    @staticmethod
-    def delete(team_id):
-        mongo.db.team_leaders.delete_many({'team_id': ObjectId(team_id)})
-        mongo.db.submissions.delete_many({'team_id': ObjectId(team_id)})
-        mongo.db.teams.delete_one({'_id': ObjectId(team_id)})
-
-    @staticmethod
-    def get_teams_by_student(team_lead_id):  # New method
-        teams = mongo.db.teams.find({'team_lead': team_lead_id})
-          # Adjust query as needed
-        return teams
+#     @staticmethod
+#     def get_teams_by_student(team_lead_id):  # New method
+#         teams = mongo.db.teams.find({'team_lead': team_lead_id})
+#           # Adjust query as needed
+#         return teams
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -122,20 +108,19 @@ from database import mongo
 from bson.objectid import ObjectId
 
 class User(UserMixin):
-    def __init__(self, id, username, email, password, role, name=None, faculty_roll_no=None): # Add name and faculty_roll_no
+    def __init__(self, id, username, email, password, role, name=None, faculty_roll_no=None):
         self.id = id
         self.username = username
         self.email = email
         self.password = password
         self.role = role
-        self.name = name #initialise name
-        self.faculty_roll_no = faculty_roll_no #initialise faculty_roll_no
+        self.name = name
+        self.faculty_roll_no = faculty_roll_no
 
     @staticmethod
     def get(identifier):
         try:
             if isinstance(identifier, str):
-                # Check if the identifier is a valid ObjectId
                 if ObjectId.is_valid(identifier):
                     user_data = mongo.db.users.find_one({'_id': ObjectId(identifier)})
                 else:
@@ -145,13 +130,13 @@ class User(UserMixin):
 
             if user_data:
                 return User(
-                    id=str(user_data['_id']), # Ensure ID is converted to string
+                    id=str(user_data['_id']),
                     username=user_data['username'],
                     email=user_data['email'],
                     password=user_data['password'],
                     role=user_data['role'],
-                    name=user_data.get('name'),  # Get name, default to None if not exists
-                    faculty_roll_no=user_data.get('faculty_roll_no') # Get faculty_roll_no
+                    name=user_data.get('name'),
+                    faculty_roll_no=user_data.get('faculty_roll_no')
                 )
         except Exception as e:
             print(f"Error in User.get: {e}")
@@ -171,19 +156,46 @@ class User(UserMixin):
             name=user.get('name'),
             faculty_roll_no=user.get('faculty_roll_no')
         )
+    
+    @staticmethod
+    def get_by_email(email):
+        user = mongo.db.users.find_one({'email': email})
+        if not user:
+            return None
+        return User(
+            id=str(user['_id']),
+            username=user['username'],
+            email=user['email'],
+            password=user['password'],
+            role=user['role'],
+            name=user.get('name'),
+            faculty_roll_no=user.get('faculty_roll_no')
+        )
 
     @staticmethod
-    def create(username, email, password, role, name=None, faculty_roll_no=None): # Add name and faculty_roll_no
-        hashed_password = generate_password_hash(password)
+    def create(username, email, password=None, role=None, name=None, faculty_roll_no=None):
+        if not password:
+            password = generate_temporary_password()
+            hashed_password = generate_password_hash(password)
+        else:
+            hashed_password = generate_password_hash(password)
+
         result = mongo.db.users.insert_one({
             'username': username,
             'email': email,
             'password': hashed_password,
             'role': role,
-            'name': name, #save name
-            'faculty_roll_no': faculty_roll_no # Save faculty_roll_no
+            'name': name,
+            'faculty_roll_no': faculty_roll_no
         })
-        return str(result.inserted_id)
+        user_id = str(result.inserted_id)
+        user = User.get(user_id) # Retrieve the created user
+
+        if role == 'faculty':
+            send_credentials_email(email, username, password, role)
+            # print(f"Credentials email sent to {email} for {role}")
+
+        return user_id
 
     @staticmethod
     def delete(user_id):
@@ -214,41 +226,68 @@ class User(UserMixin):
         ) for student in students]
 
 
+class Team(object): # Inheriting from object for older Python versions
+    @staticmethod
+    def create(name,team_lead_id, faculty_id,leader_roll_no):
+        return mongo.db.teams.insert_one({'name': name,'team_lead':team_lead_id, 'faculty_id': ObjectId(faculty_id),'team_lead_roll':leader_roll_no}).inserted_id
 
-# class TeamLeader:
-#     @staticmethod
-#     def create( roll_no, name, branch, section, email):
-#         team_lead = mongo.db.team_leaders.insert_one({
-#             'roll_no': roll_no,
-#             'name': name,
-#             'branch': branch,
-#             'section': section,
-#             'email': email
-#         })
-#         return team_lead.inserted_id
-#     @staticmethod
-#     def get(team_lead_id):
-#         team_lead = mongo.db.team_leaders.find_one({'_id': ObjectId(team_lead_id)})
-#         if team_lead:
-#             team_lead['_id'] = str(team_lead['_id'])
-#         return team_lead['name']
+    @staticmethod
+    def get_all(faculty_id):
+        teams = list(mongo.db.teams.find({'faculty_id': ObjectId(faculty_id)}))
+        for team in teams:
+            team['_id'] = str(team['_id'])
+        return teams
+
+    @staticmethod
+    def get_by_team_lead(team_lead_id):
+        teams = list(mongo.db.teams.find({'team_lead': team_lead_id}))
+        for team in teams:
+            team['_id'] = str(team['_id'])
+        return teams
+
+    @staticmethod
+    def get(team_id):
+        team = mongo.db.teams.find_one({'_id': ObjectId(team_id)})
+        if team:
+            team['_id'] = str(team['_id'])
+        return team
+
+    @staticmethod
+    def update_faculty_id(team_id, new_faculty_id):
+        print(f"Updating faculty_id for team {team_id} to {new_faculty_id}")
+        mongo.db.teams.update_one(
+            {"_id": ObjectId(team_id)},
+            {"$set": {"faculty_id": new_faculty_id}}
+        )
+
+    @staticmethod
+    def delete(team_id):
+        mongo.db.team_leaders.delete_many({'team_id': ObjectId(team_id)})
+        mongo.db.submissions.delete_many({'team_id': ObjectId(team_id)})
+        mongo.db.teams.delete_one({'_id': ObjectId(team_id)})
+
+    @staticmethod
+    def get_teams_by_student(team_lead_id):
+        print(f"Getting teams for team lead ID: {team_lead_id}")
+        teams = list(mongo.db.teams.find({'team_lead': ObjectId(team_lead_id)}))
+        return teams
 
 class TeamLeader(UserMixin):
-
-    def __init__(self, username, email, password, role,roll_no, id=None):
+    def __init__(self, id, username, email, password, role, roll_no): # Ensure id is first
+        self.id = id
         self.username = username
         self.email = email
         self.password = password
         self.role = role
-        self.id = id
         self.roll_no = roll_no
+
     def get_id(self):
         return str(self.id)
-    
+
+    @staticmethod
     def get_tl(identifier):
         try:
             if isinstance(identifier, str):
-                # Check if the identifier is a valid ObjectId
                 if ObjectId.is_valid(identifier):
                     user_data = mongo.db.team_leaders.find_one({'_id': ObjectId(identifier)})
                 else:
@@ -258,33 +297,57 @@ class TeamLeader(UserMixin):
 
             if user_data:
                 return TeamLeader(
+                    id=str(user_data['_id']), # Ensure ID is converted to string
                     username=user_data['username'],
                     email=user_data['email'],
                     password=user_data['password'],
                     role=user_data['role'],
-                    roll_no=user_data.get('roll_no'),
-                    id=user_data['_id']
+                    roll_no=user_data.get('roll_no')
                 )
         except Exception as e:
-            print(f"Error in User.get: {e}")
+            print(f"Error in TeamLeader.get_tl: {e}")
         return None
 
 
     @staticmethod
-    def create(roll_no, name, branch, section, email, username, password):  # Added username, password
-        hashed_password = generate_password_hash(password)  # Hash the password
-        team_lead = mongo.db.team_leaders.insert_one({
-        'roll_no': roll_no,
-        'name': name,
-        'branch': branch,
-        'section': section,
-        'email': email,
-        'role': 'team_leader',  # Added role
-        'username': username,  # Added
-        'password': hashed_password  # Added
+    def get_by_email(email):
+        user_data = mongo.db.team_leaders.find_one({'email': email})
+        if not user_data:
+            return None
+        return TeamLeader(
+            id=str(user_data['_id']),
+            username=user_data['username'],
+            email=user_data['email'],
+            password=user_data['password'],
+            role=user_data['role'],
+            roll_no=user_data.get('roll_no')
+        )  
+    
+    @staticmethod
+    def create(roll_no, name, branch, section, email, username, password=None):
+        if not password:
+            password = generate_temporary_password()
+            hashed_password = generate_password_hash(password)
+        else:
+            hashed_password = generate_password_hash(password)
+
+        team_leader = mongo.db.team_leaders.insert_one({
+            'roll_no': roll_no,
+            'name': name,
+            'branch': branch,
+            'section': section,
+            'email': email,
+            'role': 'team_leader',
+            'username': username,
+            'password': hashed_password
         })
-        return team_lead.inserted_id
- 
+        team_leader_id = str(team_leader.inserted_id)
+        team_leader_obj = TeamLeader.get_tl(team_leader_id) # Retrieve the created team leader
+
+        send_credentials_email(email, username, password, 'team_leader')
+
+        return team_leader_id
+
     @staticmethod
     def update(project_id, title=None, description=None, team_members=None,
                category=None, guide_name=None, github_link=None, drive_link=None,
@@ -313,29 +376,27 @@ class TeamLeader(UserMixin):
             mongo.db.projects.update_one({'_id': ObjectId(project_id)}, {'$set': update_data})
             return True
         return False
-    
+
     @staticmethod
-    def get(team_lead_id):
-        team_lead = mongo.db.team_leaders.find_one({'_id': ObjectId(team_lead_id)})
+    def get(team_leader_id):
+        team_lead = mongo.db.team_leaders.find_one({'_id': ObjectId(team_leader_id)})
         if team_lead:
             team_lead['_id'] = str(team_lead['_id'])
         return team_lead
 
-
     @staticmethod
-    def get_by_roll_no(roll_no):  # New method to get by username
+    def get_by_roll_no(roll_no):
         team_data = mongo.db.team_leaders.find_one({'roll_no': roll_no})
         if team_data:
             return TeamLeader(
+                id=str(team_data.get('_id')),
                 username=team_data.get('username'),
                 email=team_data.get('email'),
                 password=team_data.get('password'),
                 role=team_data.get('role'),
-                roll_no=team_data.get('roll_no'),
-                id=team_data.get('_id')
+                roll_no=team_data.get('roll_no')
             )
         return None
-
 
     @staticmethod
     def get_all_by_team(team_id):
@@ -343,11 +404,10 @@ class TeamLeader(UserMixin):
         for leader in leaders:
             leader['_id'] = str(leader['_id'])
         return leaders
-    
+
     @staticmethod
     def delete(submission_id):
         mongo.db.team_leaders.delete_one({'_id': ObjectId(submission_id)})
-    
 # class Submission:
 #     @staticmethod
 #     def get_all(team_id):
@@ -706,3 +766,5 @@ class Submission:
     @staticmethod
     def delete(submission_id):
         mongo.db.submissions.delete_one({'_id': ObjectId(submission_id)})
+
+

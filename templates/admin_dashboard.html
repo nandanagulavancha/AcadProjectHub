@@ -1,58 +1,97 @@
 <!DOCTYPE html>
-<html lang="en"></html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - AcadProjectHub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --background-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .dashboard-container {
-            width: 90%;
+            width: 100%;
             max-width: 1200px;
-            margin-top: 30px;
+            margin: 0 auto;
         }
 
         .header {
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
+            background: white;
             padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             margin-bottom: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), #6ab7ff);
+        }
+
+        .header h1 {
+            color: var(--secondary-color);
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
         .section {
-            background-color: white;
+            background: white;
             padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             margin-bottom: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .section h2 {
-            color: #2c3e50;
-            border-bottom: 3px solid #2c3e50;
+            color: var(--secondary-color);
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 25px;
             padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
         }
 
         .subsection {
-            background-color: #f9f9f9;
-            padding: 20px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+        }
+
+        .subsection h3 {
+            color: var(--secondary-color);
+            font-size: 1.4em;
             margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .form-group {
@@ -61,87 +100,179 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-weight: 500;
         }
 
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="password"] {
+        .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            font-size: 16px;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
         }
 
-        .button {
-            background-color: #3498db;
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .btn {
+            background: var(--primary-color);
             color: white;
-            padding: 14px 24px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 6px;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
         }
 
-        .button:hover {
-            background-color: #2980b9;
+        .btn:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 25px 0;
+            border-radius: var(--border-radius);
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         th, td {
-            padding: 16px 20px;
+            padding: 15px 20px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
 
         th {
-            background-color: #34495e;
+            background: var(--secondary-color);
             color: white;
-            font-weight: bold;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            transition: background-color 0.3s ease;
         }
 
         tbody tr:hover {
-            background-color: #f2f2f2;
-        }
-
-        .logout {
-            margin-top: 30px;
+            background-color: #f8f9fa;
         }
 
         .faculty-list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .faculty-list-header h3 {
-            color: #2c3e50;
-            font-size: 24px;
+            color: var(--secondary-color);
+            font-size: 1.4em;
+            margin: 0;
+        }
+
+        .logout {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .flash-message {
+            background: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .flash-message.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .flash-message.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 10px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .faculty-list-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <div class="header">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
             <h1>Admin Dashboard</h1>
+            <div class="logout">
+            <a href="/auth/logout" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            </div>
         </div>
+        
 
         <div class="section">
             <h2>Faculty Management</h2>
@@ -150,31 +281,31 @@
                 <form method="POST" action="{{ url_for('admin.create_faculty') }}">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Name" required>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Enter faculty name" required>
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="Username" required>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Enter username" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter email address" required>
                     </div>
                     <div class="form-group">
                         <label for="faculty_roll_no">Faculty ID</label>
-                        <input type="text" id="faculty_roll_no" name="faculty_roll_no" placeholder="Faculty Roll No" required>
+                        <input type="text" id="faculty_roll_no" name="faculty_roll_no" class="form-control" placeholder="Enter faculty ID" required>
                     </div>
-                    <button type="submit" class="button">Create Faculty</button>
+                    <button type="submit" class="btn">Create Faculty</button>
                 </form>
             </div>
+
             <div class="faculty-list-header">
-                <h3>List Faculty</h3>
-                <a href="{{ url_for('admin.delete_faculty') }}" class="button">Delete Faculty</a>
+                <h3>Faculty List</h3>
+                <a href="{{ url_for('admin.delete_faculty') }}" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete Faculty
+                </a>
             </div>
+
             <table>
                 <thead>
                     <tr>
@@ -197,9 +328,36 @@
             </table>
         </div>
 
-        <div class="logout">
-            <a class="button" href="/auth/logout">Logout</a>
-        </div>
     </div>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ 'error' if category == '0' else 'success' }}">
+            <i class="fas {{ 'fa-exclamation-circle' if category == '0' else 'fa-check-circle' }}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            
+            flashMessages.forEach(flash => {
+                setTimeout(() => {
+                    flash.style.transition = 'all 0.5s ease-in-out';
+                    flash.style.transform = 'translateX(100%)';
+                    flash.style.opacity = '0';
+                    setTimeout(() => {
+                        flash.remove();
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html>

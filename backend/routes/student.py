@@ -191,34 +191,31 @@ def dashboard():
     individual student marks, and submission status.
     Only accessible to team leaders.
     """
-    # Ensure only team leaders can access this dashboard
-    # if current_user.role != 'team_leader':
-    #     flash("You are not authorized to view this page.", "danger")
-    #     return redirect(url_for('main.index')) # Redirect to a safe page
-
-    teams = Team.get_teams_by_student(current_user.id)  # Get teams led by the current user
+    teams = Team.get_by_team_lead(current_user.id)  # Use the new method
     templates = []
     deadlines = []
     student_marks = {}
     submission_status = "Not Submitted"  # Default status
     submissions = []
     announcements = []
-    print(current_user.id,submission_status)
-    if teams:
-        faculty_id = teams[0]['faculty_id']  # Assuming all teams are under the same faculty
+    project = None  # Initialize project as None by default
+
+    if teams:  # Check if teams is not empty
+        faculty_id = teams[0]['faculty_id'] 
         deadlines = Deadline.get_all(faculty_id)
         templates = TemplateFile.get_all(faculty_id)
         announcements = Announcement.get_all(faculty_id)
-        # print(TeamLeader.get(current_user.id))
+        
         # Get project submission status
-        # project = None
         project = Project.get_by_team_lead_roll_no(TeamLeader.get(current_user.id)['roll_no'])
         if project:
             submission_status = "Submitted"
-        # print(project)
+        
         # Calculate marks for each student in the team
         for team in teams:
             submissions = Submission.get_by_team_id(team['_id'])
+    else:
+        flash("You are not assigned to any team.", "warning")
 
     return render_template(
         'student_dashboard.html',
@@ -228,7 +225,8 @@ def dashboard():
         submission_status=submission_status,
         project=project,
         submissions=submissions,
-        announcements=announcements
+        announcements=announcements,
+        teams=teams
     )
 
 @student_bp.route('/project-submission', methods=['GET', 'POST'])
@@ -255,8 +253,8 @@ def project_submission():
 
         if existing_project and len(files) > 1:
             error_message = "You can only upload one ZIP file."
-        elif not existing_project and (len(files) != 1 or not files[0].filename.endswith('.zip')):
-            error_message = "Please upload exactly one file in ZIP format."
+        # elif not existing_project and (len(files) > 1 or not files[0].filename.endswith('.zip')):
+        #     error_message = "Please upload exactly one file in ZIP format."
         elif len(files) == 1 and files[0].filename.endswith('.zip'):
             zip_file = files[0]
             filename = secure_filename(zip_file.filename)
@@ -469,3 +467,34 @@ def download_template(file_id):
     else:
         flash('File record not found.', 'error')
         return redirect(url_for('student.dashboard'))  # Redirect to student dashboard
+
+@student_bp.route('/download_zip/<zip_file_id>')
+@login_required
+def download_zip(zip_file_id):
+    """
+    Allows students to download submitted zip files.
+
+    Args:
+        zip_file_id (str): The ID of the zip file to download (which is the ObjectId of the project).
+
+    Returns:
+        A Flask Response object containing the file, or a redirect with an error.
+    """
+    project = Project.get_by_id(zip_file_id)
+    if project:
+        filepath = project['zip_file_id']
+        filename = os.path.basename(filepath)
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as f:
+                file_content = f.read()
+            return Response(
+                file_content,
+                mimetype='application/zip',
+                headers={'Content-Disposition': f'attachment; filename={filename}'}
+            )
+        else:
+            flash('Zip file not found on server.', 'error')
+            return redirect(url_for('student.dashboard'))
+    else:
+        flash('Project record not found.', 'error')
+        return redirect(url_for('student.dashboard'))

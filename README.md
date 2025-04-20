@@ -1,105 +1,98 @@
 # ProjectEduHub
 
-**Description**
-
-ProjectEduHub is a web application designed to facilitate project management and collaboration within an educational institution. It provides tools for faculty to manage student teams, assignments, and deadlines, while also enabling students to collaborate effectively on their projects.
-
-You can find the project repository here: [https://github.com/nandanagulavancha/ProjectEduHub](https://github.com/nandanagulavancha/ProjectEduHub)
+ProjectEduHub is a web-based platform for managing educational projects, facilitating collaboration between students, faculty, and administrators.
 
 ## Features
 
-**Faculty Features:**
+- User Authentication (Students, Faculty, Admin)
+- Project Submission and Management
+- Team Creation and Management
+- File Upload System
+- Dashboard for Different User Roles
+- Email Notifications
 
-* Manage faculty accounts
-* Create and delete faculty members
-* View a dashboard of teams and deadlines
-* Create student teams and team leaders
-* Delete teams and reassign students
-* View team project details
-* Assign marks and provide feedback to teams
-* Set deadlines for project submissions
-* Post announcements to students
-* Upload and download template files
-* Download submitted project zip files
+## Prerequisites
 
-**Student Features:**
-
-* View their team and team members
-* View project details
-* View deadlines and announcements
-* Download template files
-
-**Admin Features:**
-
-* The application automatically creates a default admin user on first run (username: "admin", email: "admin1@example.com", password: "admin"). **Note:** The password is "admin" and is hashed in the database. You should change this password immediately after the initial login.
-
-## Technologies Used
-
-* Python
-* Flask framework
-* MongoDB database
-* HTML
-* CSS
-* JavaScript
-* Bootstrap
+- Python 3.8 or higher
+- MongoDB 4.4 or higher
+- Git
 
 ## Installation
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/nandanagulavancha/ProjectEduHub.git](https://github.com/nandanagulavancha/ProjectEduHub.git)
-    ```
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ProjectEduHub.git
+cd ProjectEduHub
+```
 
-2.  **Navigate to the project directory:**
-    ```bash
-    cd ProjectEduHub
-    ```
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+```
 
-3.  **Set up a virtual environment (recommended):**
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate  # On Linux/macOS
-    venv\Scripts\activate  # On Windows
-    ```
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-4.  **Install the dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+4. Set up environment variables:
+- Copy the `.env.example` file to `.env`
+- Update the values in `.env` with your configuration:
+  - Set your MongoDB URI
+  - Configure email settings
+  - Update admin credentials
+  - Set a secure SECRET_KEY
 
-5.  **Configure the database:**
-    * Ensure you have MongoDB installed and running.
-    * The application is configured to use MongoDB at `mongodb://localhost:27017/ProjectEduHub` by default. If your MongoDB instance is running elsewhere, you will need to modify the `MONGO_URI` configuration in the `app.py` file.
+5. Initialize the database:
+- Make sure MongoDB is running on your system
+- The application will create necessary collections on first run
 
-6.  **Run the application:**
-    ```bash
-    python backend/app.py
-    ```
-    The application will automatically create a default admin user on the first run. The username is "admin", the email is "admin1@example.com", and the password is "admin". You should change this password immediately after logging in.
+## Running the Application
 
-## Usage
+1. Start the Flask application:
+```bash
+flask run
+```
 
-**Admin:**
+2. Access the application:
+- Open your web browser and navigate to `http://localhost:5000`
+- Default admin credentials:
+  - Username: admin
+  - Password: (as specified in your .env file)
 
-1.  Log in with the default admin credentials (username: "admin", password: "admin").
-2.  Change the default admin password immediately.
-3.  Use the admin interface to manage faculty and other administrative tasks.
+## Project Structure
 
-**Faculty:**
+```
+ProjectEduHub/
+├── backend/
+│   ├── app.py           # Main application file
+│   ├── database.py      # Database configuration
+│   ├── models.py        # Data models
+│   └── routes/          # Route handlers
+├── templates/           # HTML templates
+├── student_uploads/     # File upload directory
+├── requirements.txt     # Python dependencies
+├── .env                # Environment variables
+└── README.md           # This file
+```
 
-1.  Log in with your faculty credentials.
-2.  Use the dashboard to manage teams, deadlines, and announcements.
-3.  Create teams and assign projects.
-4.  Upload template files for students.
-5.  Download project submissions.
+## Security Notes
 
-**Students:**
+1. Never commit your `.env` file to version control
+2. Change all default passwords in production
+3. Use strong, unique passwords for admin accounts
+4. Keep MongoDB and Python packages updated
+5. Regularly backup your database
 
-1.  Log in with your student credentials.
-2.  View your team and project details.
-3.  Submit your projects before the deadline.
-4.  Download template files.
+## Contributing
 
-**Note:**
-* This application requires MongoDB to be installed and running on your system. Please ensure MongoDB is set up before running the application.
-* You can access the login page at the following URL after running the application: [http://127.0.0.1:5000/auth/login](http://127.0.0.1:5000/auth/login)
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

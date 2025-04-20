@@ -1,288 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+    <title>Student Dashboard - AcadProjectHub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --warning-color: #f39c12;
+            --background-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #ecf0f1;
-            color: #333;
-            line-height: 1.6;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 40px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-            border-radius: 12px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        h1 {
-            text-align: center;
-            color: #2980b9;
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             margin-bottom: 30px;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 20px;
-        }
-
-        h2 {
-            color: #2980b9;
-            margin-top: 40px;
-            border-bottom: 3px solid #e0e0e0;
-            padding-bottom: 15px;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        ul li {
-            padding: 20px;
-            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            overflow: hidden;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.2s ease;
         }
 
-        ul li:last-child {
-            border-bottom: none;
-        }
-
-        ul li:hover {
-            background-color: #f9f9f9;
-        }
-
-        .template-item a {
-            color: #3498db;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            padding: 10px 15px;
-            border-radius: 6px;
-            border: 1px solid #3498db;
-            background-color: white;
-        }
-
-        .template-item a:hover {
-            text-decoration: none;
-            color: #fff;
-            background-color: #2980b9;
-            border-color: #2980b9;
-        }
-
-        .marks-table {
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), #64b5f6);
         }
 
-        .marks-table th,
-        .marks-table td {
-            border: 1px solid #ddd;
-            padding: 15px 20px;
-            text-align: left;
+        .header h1 {
+            color: var(--secondary-color);
+            font-size: 2em;
+            font-weight: 700;
+            margin: 0;
         }
 
-        .marks-table th {
-            background-color: #3498db;
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: var(--secondary-color);
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .btn {
+            background: var(--primary-color);
             color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .marks-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .submission-status {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            text-align: center;
-            border-radius: 10px;
-            background-color: #e8f0fe;
-            color: #555;
-            font-size: 1.1em;
-        }
-
-        .submit-button {
-            display: block;
-            width: auto;
-            padding: 10px;
-            margin-top: 30px;
-            background-color: #3498db;
-            color: white;
+            padding: 12px 25px;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            font-weight: 500;
             cursor: pointer;
-            text-align: center;
+            transition: all 0.3s ease;
             text-decoration: none;
-            font-size: 14px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .submit-button:hover {
-            background-color: #2980b9;
+        .btn:hover {
+            background: #357abd;
             transform: translateY(-2px);
         }
 
-        .dashboard-section {
-            margin-bottom: 40px;
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
         }
 
-        .no-data {
-            font-style: italic;
-            color: #777;
-        }
-
-        .project-details {
-            margin-top: 25px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-        }
-
-        .project-details p {
-            margin-bottom: 10px;
-        }
-
-        .project-details strong {
-            font-weight: 600;
-            color: #34495e;
-        }
-
-        /* New styles for logout button */
-        .logout-button {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #e74c3c;
+        .btn-outline:hover {
+            background: var(--primary-color);
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
         }
 
-        .logout-button:hover {
-            background-color: #c0392b;
+        .btn-warning {
+            background: var(--warning-color);
         }
 
-        /* Style adjustments for even better presentation */
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
         .announcement-item {
-            background-color: #f0f8ff;
-            border: 1px solid #b0c4de;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
         }
 
         .announcement-item h4 {
-            color: #2980b9;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
         }
 
-        .submissions-section {
-            margin-top: 30px;
+        .announcement-item p {
+            color: var(--text-color);
+            line-height: 1.6;
         }
 
-        .submissions-title {
-            color: #2980b9;
-            border-bottom: 2px solid #2980b9;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+        .deadline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+        }
+
+        .deadline-item .date {
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+
+        .template-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
         }
 
         .submission-block {
-            background-color: #f9f9f9;
+            background: #f8f9fa;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
         }
 
         .submission-block p {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .submission-block ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            padding-left: 0;
+            list-style: none;
+            padding-left: 20px;
         }
 
         .submission-block li {
-            padding: 5px 0;
-            border-bottom: none;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .submission-block li::before {
+            content: '•';
+            color: var(--primary-color);
+            position: absolute;
+            left: -15px;
+        }
+
+        .submission-status {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 1.1em;
+            color: var(--text-color);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .project-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .project-details p {
+            margin-bottom: 15px;
+        }
+
+        .no-data {
+            color: #95a5a6;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .flash-message {
+            background: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .flash-message.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .flash-message.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
-
 <body>
-
-
     <div class="container">
-        <h1>Student Dashboard</h1>
+        <div class="header">
+            {% for team in teams %}
+            <h1>{{team.name}}'s Dashboard</h1>
+            {% endfor %}
+            <div class="header-actions">
+                <a href="{{ url_for('auth.change_password') }}" class="btn btn-warning">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
 
-        <div class="dashboard-section">
-            <h2>Announcements</h2>
+        <div class="section">
+            <h2><i class="fas fa-bullhorn"></i> Announcements</h2>
             {% if announcements %}
-            <ul>
-                {% for announcement in announcements %}
-                <li class="announcement-item">
-                    <h4 style="padding: 5px;">{{ announcement.title }}</h4>
-                    <p style="padding: 5px;">{{ announcement.content }}</p>
-                </li>
-                {% endfor %}
-            </ul>
+            {% for announcement in announcements %}
+            <div class="announcement-item">
+                <h4>{{ announcement.title }}</h4>
+                <p>{{ announcement.content }}</p>
+            </div>
+            {% endfor %}
             {% else %}
             <p class="no-data">No announcements yet.</p>
             {% endif %}
         </div>
 
-        <div class="dashboard-section">
-            <h2>Deadlines</h2>
+        <div class="section">
+            <h2><i class="fas fa-calendar-alt"></i> Deadlines</h2>
             {% if deadlines %}
-            <ul>
-                {% for deadline in deadlines %}
-                <li>{{ deadline.title }} - {{ deadline.date }}</li>
-                {% endfor %}
-            </ul>
+            {% for deadline in deadlines %}
+            <div class="deadline-item">
+                <span>{{ deadline.title }}</span>
+                <span class="date">{{ deadline.date }}</span>
+            </div>
+            {% endfor %}
             {% else %}
             <p class="no-data">No deadlines available.</p>
             {% endif %}
         </div>
 
-        <div class="dashboard-section">
-            <h2>Project Templates</h2>
+        <div class="section">
+            <h2><i class="fas fa-file-alt"></i> Project Templates</h2>
             {% if templates %}
-            <ul>
-                {% for template in templates %}
-                <li class="template-item">
-                    {{ template.filename }}
-                    <a href="{{ url_for('faculty.download_template', file_id=template._id) }}">Download</a>
-                </li>
-                {% endfor %}
-            </ul>
+            {% for template in templates %}
+            <div class="template-item">
+                <span>{{ template.filename }}</span>
+                <a href="{{ url_for('faculty.download_template', file_id=template._id) }}" class="btn btn-outline">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </div>
+            {% endfor %}
             {% else %}
             <p class="no-data">No templates available.</p>
             {% endif %}
         </div>
-        <div class="submissions-section">
-            <h2 class="submissions-title">Marks and Feedback</h2>
-            {% if submissions %}
 
+        <div class="section">
+            <h2><i class="fas fa-star"></i> Marks and Feedback</h2>
+            {% if submissions %}
             <div class="submission-block">
                 <p>
                     <strong>Marks:</strong>
@@ -297,7 +382,7 @@
                     {% endif %}
                 </p>
                 {% if submissions.student_feedback %}
-                <p><strong>Feedback:</strong> </p>
+                <p><strong>Feedback:</strong></p>
                 <ul>
                     {% for roll_no, feedback in submissions.student_feedback.items() %}
                     <li><strong>{{roll_no}}</strong>: {{feedback}}</li>
@@ -305,35 +390,39 @@
                 </ul>
                 {% endif %}
             </div>
-            <div>
-                <p><strong>Team Feedback:</strong> </p>{{ submissions.overall_feedback }}
+            <div class="submission-block">
+                <p><strong>Team Feedback:</strong></p>
+                <p>{{ submissions.overall_feedback }}</p>
             </div>
             {% else %}
-            <p>No marks found for this project.</p>
+            <p class="no-data">No marks found for this project.</p>
             {% endif %}
         </div>
 
-        <div class="dashboard-section">
-            <h2>Submission Status</h2>
+        <div class="section">
+            <h2><i class="fas fa-tasks"></i> Submission Status</h2>
             <div class="submission-status">
                 Status: {{ submission_status }}
             </div>
         </div>
 
-        <div class="dashboard-section">
-            <h2>Your Project</h2>
+        <div class="section">
+            <h2><i class="fas fa-project-diagram"></i> Your Project</h2>
             {% if project %}
             <div class="project-details">
                 <p>You have submitted a project: <strong>{{ project.title }}</strong></p>
-                <p><a href="{{ url_for('student.project_details', project_id=project._id) }}"
-                        class="submit-button">View Project Details</a></p>
+                <a href="{{ url_for('student.project_details', project_id=project._id) }}" class="btn">
+                    <i class="fas fa-eye"></i> View Project Details
+                </a>
             </div>
             {% else %}
             <p class="no-data">You have not submitted a project yet.</p>
             {% endif %}
         </div>
-        <div>
-            <a href="{{ url_for('student.project_submission') }}" class="submit-button">
+
+        <div class="section">
+            <a href="{{ url_for('student.project_submission') }}" class="btn">
+                <i class="fas {% if submission_status == 'Submitted' %}fa-edit{% else %}fa-upload{% endif %}"></i>
                 {% if submission_status == "Submitted" %}
                 Edit Submission
                 {% else %}
@@ -341,9 +430,19 @@
                 {% endif %}
             </a>
         </div>
-        <a class="logout-button" href="/auth/logout" style="margin-top: 20px; display: inline-block;">Logout</a>
     </div>
 
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ 'error' if category == '0' else 'success' }}">
+            <i class="fas {{ 'fa-exclamation-circle' if category == '0' else 'fa-check-circle' }}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
 </body>
-
 </html>
