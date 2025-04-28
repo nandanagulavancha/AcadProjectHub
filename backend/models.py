@@ -8,7 +8,7 @@ import jinja2
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import current_app  # To access Flask app configurations
+from flask import current_app  
 from flask_login import UserMixin
 from database import mongo
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,19 +24,19 @@ def generate_temporary_password(length=12):
 def send_credentials_email(to_email, username, password, role):
     try:
         msg = MIMEMultipart()
-        msg['From'] = current_app.config['MAIL_DEFAULT_SENDER'] # Get sender from Flask config
+        msg['From'] = current_app.config['MAIL_DEFAULT_SENDER'] 
         msg['To'] = to_email
         msg['Subject'] = f'Your {role.capitalize()} Account Credentials for ProjectEduHub'
 
         body = f"""
         Hello {username},
-
+ 
         Your {role.capitalize()} account has been created on AcadProjectHub with the following credentials:
 
         Username: {username}
         Password: {password}
 
-        Please log in to https://rdsj78xb-3000.inc1.devtunnels.ms/auth/login and change your password as soon as possible for security reasons.
+        Please log in to http://rdsj78xb-3000.inc1.devtunnels.ms/auth/login and change your password as soon as possible for security reasons.
 
         Thank you,
         The ProjectEduHub Team
@@ -52,55 +52,6 @@ def send_credentials_email(to_email, username, password, role):
     except Exception as e:
         print(f"Error sending credentials email to {to_email} for {role}: {e}")
 
-
-# from database import mongo
-# from bson.objectid import ObjectId
-
-# class Team:
-#     @staticmethod
-#     def create(name,team_lead_id, faculty_id,leader_roll_no):
-#         return mongo.db.teams.insert_one({'name': name,'team_lead':team_lead_id, 'faculty_id': ObjectId(faculty_id),'team_lead_roll':leader_roll_no}).inserted_id
-
-#     @staticmethod
-#     def get_all(faculty_id):
-#         teams = list(mongo.db.teams.find({'faculty_id': ObjectId(faculty_id)}))
-#         for team in teams:
-#             team['_id'] = str(team['_id'])
-#         return teams
-
-#     @staticmethod
-#     def get(team_id):
-#         team = mongo.db.teams.find_one({'_id': ObjectId(team_id)})
-#         if team:
-#             team['_id'] = str(team['_id'])
-#         return team
-
-#     @staticmethod
-#     def update_faculty_id(team_id, new_faculty_id):
-#         """
-#         Updates the faculty_id for a given team.
-
-#         Args:
-#             team_id (str): The ID of the team to update.
-#             new_faculty_id (str): The new faculty ID.
-#         """
-#         print(f"Updating faculty_id for team {team_id} to {new_faculty_id}")
-#         mongo.db.teams.update_one(
-#             {"_id": ObjectId(team_id)},  # Filter by team ID
-#             {"$set": {"faculty_id": new_faculty_id}}  # Set the new faculty ID
-#         )
-
-#     @staticmethod
-#     def delete(team_id):
-#         mongo.db.team_leaders.delete_many({'team_id': ObjectId(team_id)})
-#         mongo.db.submissions.delete_many({'team_id': ObjectId(team_id)})
-#         mongo.db.teams.delete_one({'_id': ObjectId(team_id)})
-
-#     @staticmethod
-#     def get_teams_by_student(team_lead_id):  # New method
-#         teams = mongo.db.teams.find({'team_lead': team_lead_id})
-#           # Adjust query as needed
-#         return teams
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -189,7 +140,7 @@ class User(UserMixin):
             'faculty_roll_no': faculty_roll_no
         })
         user_id = str(result.inserted_id)
-        user = User.get(user_id) # Retrieve the created user
+        user = User.get(user_id) 
 
         if role == 'faculty':
             send_credentials_email(email, username, password, role)
@@ -226,10 +177,23 @@ class User(UserMixin):
         ) for student in students]
 
 
-class Team(object): # Inheriting from object for older Python versions
+class Team(object): 
     @staticmethod
-    def create(name,team_lead_id, faculty_id,leader_roll_no):
-        return mongo.db.teams.insert_one({'name': name,'team_lead':team_lead_id, 'faculty_id': ObjectId(faculty_id),'team_lead_roll':leader_roll_no}).inserted_id
+    def create(name, team_lead_id, faculty_id, leader_roll_no):
+        existing_team = mongo.db.teams.find_one({
+            'name': name,
+            'faculty_id': ObjectId(faculty_id)
+        })
+
+        if existing_team:
+            return None  
+
+        return mongo.db.teams.insert_one({
+            'name': name,
+            'team_lead': team_lead_id, 
+            'faculty_id': ObjectId(faculty_id),
+            'team_lead_roll': leader_roll_no
+        }).inserted_id
 
     @staticmethod
     def get_all(faculty_id):
@@ -325,6 +289,18 @@ class TeamLeader(UserMixin):
     
     @staticmethod
     def create(roll_no, name, branch, section, email, username, password=None):
+        # Check for existing team leader with same email, username, or roll number
+        existing_team_leader = mongo.db.team_leaders.find_one({
+            '$or': [
+                {'email': email},
+                {'username': username},
+                {'roll_no': roll_no}
+            ]
+        })
+
+        if existing_team_leader:
+            return None  # Return None to indicate duplicate
+
         if not password:
             password = generate_temporary_password()
             hashed_password = generate_password_hash(password)
@@ -408,24 +384,7 @@ class TeamLeader(UserMixin):
     @staticmethod
     def delete(submission_id):
         mongo.db.team_leaders.delete_one({'_id': ObjectId(submission_id)})
-# class Submission:
-#     @staticmethod
-#     def get_all(team_id):
-#         submissions = list(mongo.db.submissions.find({'team_id': ObjectId(team_id)}))
-#         for submission in submissions:
-#             submission['_id'] = str(submission['_id'])
-#         return submissions
 
-#     @staticmethod
-#     def get(submission_id):
-#         submission = mongo.db.submissions.find_one({'_id': ObjectId(submission_id)})
-#         if submission:
-#             submission['_id'] = str(submission['_id'])
-#         return submission
-
-#     @staticmethod
-#     def give_marks(submission_id, marks):
-#         mongo.db.submissions.update_one({'_id': ObjectId(submission_id)}, {'$set': {'marks': marks}})
 class Deadline:
     @staticmethod
     def create(title, date, faculty_id):

@@ -15,20 +15,38 @@ def dashboard():
 @login_required
 def create_faculty():
     if request.method == 'POST':
-        name = request.form['name']  # Get the faculty name
+        name = request.form['name']
         username = request.form['username']
         email = request.form['email']
-        faculty_roll_no = request.form['faculty_roll_no'] # get faculty roll no
+        faculty_roll_no = request.form['faculty_roll_no']
+
+        # Check for existing faculty with same email, username, or roll number
+        existing_user = mongo.db.users.find_one({
+            '$or': [
+                {'email': email},
+                {'username': username},
+                {'faculty_roll_no': faculty_roll_no}
+            ]
+        })
+
+        if existing_user:
+            if existing_user['email'] == email:
+                flash('A faculty with this email already exists.', 'error')
+            elif existing_user['username'] == username:
+                flash('A faculty with this username already exists.', 'error')
+            else:
+                flash('A faculty with this Faculty ID already exists.', 'error')
+            return redirect(url_for('admin.dashboard'))
 
         # Generate a temporary password
         temp_password = generate_temporary_password()
 
-        User.create(username=username, email=email, password=temp_password, role='faculty', name=name, faculty_roll_no=faculty_roll_no) # Pass the name and faculty_roll_no
+        User.create(username=username, email=email, password=temp_password, role='faculty', name=name, faculty_roll_no=faculty_roll_no)
         flash(f'Faculty account for {name} created. Credentials sent to {email}.', 'success')
         return redirect(url_for('admin.dashboard'))
-    return render_template('create_faculty.html')
-
-
+    
+    # If it's a GET request, redirect to the dashboard
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/delete_faculty', methods=['GET', 'POST'])
 @login_required
@@ -66,7 +84,6 @@ def delete_faculty():
         flash('Faculty deleted and teams reassigned.', 'success')
         return redirect(url_for('admin.dashboard'))
     return render_template('delete_faculty.html',  faculty_users=faculty_users)
-
 
 @admin_bp.route('/faculty_details/<faculty_id>')
 @login_required

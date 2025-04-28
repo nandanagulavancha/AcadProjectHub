@@ -1,170 +1,3 @@
-# from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-# from flask_login import login_required, current_user
-# from utils.file_handling import save_file
-# from bson.objectid import ObjectId
-# from models import Deadline, TemplateFile, Announcement, Team, TeamLeader, Submission, Project
-
-
-# student_bp = Blueprint('student', __name__)
-
-
-# @student_bp.route('/dashboard', methods=['GET', 'POST'])
-# @login_required
-# def dashboard():
-#     # Assuming current_user is an instance of TeamLeader due to login manager
-#     #teams = Team.get_teams_by_student(current_user.id)
-#     teams = []
-#     templates = []
-#     deadlines = []
-#     #print(current_user.roll_no)
-
-
-#     #if not teams:
-#      #   flash("You are not assigned to any team.", "warning")
-#       #  return render_template('student_dashboard.html', deadlines=deadlines, templates=templates)
-
-
-#     # Assuming all teams a student is in are under the same faculty for simplicity
-#     faculty_id = teams[0]['faculty_id'] if teams else None
-#     if faculty_id:
-#         deadlines = Deadline.get_all(faculty_id)
-#         templates = TemplateFile.get_all(faculty_id)
-#         #print(deadlines)
-#     else:
-#         deadlines = []
-#         templates = []
-
-
-#     return render_template('student_dashboard.html', deadlines=deadlines, templates=templates)
-
-
-# @student_bp.route('/project-submission', methods=['GET', 'POST'])
-# @login_required
-# def project_submission():
-#     error_message = None
-#     if request.method == 'POST':
-#         data = request.form
-#         files = request.files.getlist('files')
-#         screenshot_files = request.files.getlist('screenshots')
-#         file_ids = []
-#         screenshot_ids = []
-
-
-#         # team_lead_roll_no = data.get('team_lead_roll_no')  # Removed
-#         # team_lead_name = data.get('team_lead_name')      # Removed
-#         existing_project = Project.get_by_team_lead_roll_no(data.get('team_lead_roll_no')) #Still use it for validation
-
-
-#         if existing_project:
-#             error_message = "A project has already been submitted for this team lead."
-#         elif len(files) != 1 or not files[0].filename.endswith('.zip'):
-#             error_message = "Please upload exactly one file in ZIP format."
-#         else:
-#             zip_file = files[0]
-#             zip_file_id = save_file(zip_file, zip_file.filename)
-#             file_ids.append(zip_file_id)
-
-
-#             for screenshot in screenshot_files:
-#                 if screenshot and allowed_file(screenshot.filename):
-#                     screenshot_id = save_file(screenshot, screenshot.filename)
-#                     screenshot_ids.append(screenshot_id)
-#                 elif screenshot:
-#                     error_message = "Invalid screenshot/video file type."
-#                     break
-
-
-#             if not error_message:
-#                 team_members = []
-#                 for i in range(1, 5):
-#                     member_name = data.get(f'member_name_{i}')
-#                     member_roll_no = data.get(f'member_roll_no_{i}')
-#                     if member_name and member_roll_no:
-#                         team_members.append({'name': member_name, 'roll_no': member_roll_no})
-
-
-#                 project_id = Project.create(
-#                     title=data['title'],
-#                     description=data['description'],
-#                     team_lead_roll_no=data.get('team_lead_roll_no'), #still use it for validation
-#                     team_lead_name=data.get('team_lead_name'), #still use it for validation
-#                     team_members=team_members,
-#                     category=data['category'],
-#                     guide_name=data['guide_name'],
-#                     github_link=data['github_link'],
-#                     drive_link=data['drive_link'],
-#                     zip_file_id=zip_file_id,
-#                     screenshot_ids=screenshot_ids
-#                 )
-#                 flash('Project submitted successfully!', 'success')
-#                 return redirect(url_for('student.dashboard')) # Redirect back to dashboard
-#     if error_message:
-#         flash(error_message, 'error')
-#     return render_template('project_submission.html', error_message=error_message)
-
-
-# def allowed_file(filename):
-#     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}  # Add video extensions
-#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-
-
-# @student_bp.route('/project-status')
-# @login_required
-# def project_status():
-#     projects = Project.get_all()
-#     student_projects = [
-#         project
-#         for project in projects
-#         if current_user.username in project.get('team_members', [])  # Adjust as needed
-#     ]
-#     return render_template('project_status.html', projects=student_projects)
-
-
-# @student_bp.route('/project-details/<project_id>')
-# @login_required
-# def project_details(project_id):
-#     project = Project.get_by_id(project_id)
-#     if project and current_user.username in project.get('team_members', []):  # Adjust as needed
-#         return render_template('project_view.html', project=project)
-#     else:
-#         flash('Project not found or you do not have permission.', 'error')
-#         return redirect(url_for('student.dashboard'))
-
-
-# def allowed_file(filename):
-#     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}  # Add video extensions
-#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-
-
-# # @student_bp.route('/project-status')
-# # @login_required
-# # def project_status():
-# #     projects = Project.get_all()
-# #     student_projects = [
-# #         project
-# #         for project in projects
-# #         if current_user.username in project.get('team_members', [])  # Adjust as needed
-# #     ]
-# #     return render_template('project_status.html', projects=student_projects)
-
-
-# # @student_bp.route('/project-details/<project_id>')
-# # @login_required
-# # def project_details(project_id):
-# #     project = Project.get_by_id(project_id)
-# #     if project and current_user.username in project.get('team_members', []):  # Adjust as needed
-# #         return render_template('project_view.html', project=project)
-# #     else:
-# #         flash('Project not found or you do not have permission.', 'error')
-# #         return redirect(url_for('student.dashboard'))
-
-
-
-
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
@@ -176,7 +9,7 @@ import os
 from flask import Response, abort
 
 student_bp = Blueprint('student', __name__)
-UPLOAD_FOLDER = 'student_uploads'  # Separate folder for student uploads
+UPLOAD_FOLDER = 'student_uploads'  
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'zip'}
 
 def allowed_file(filename):
@@ -191,27 +24,25 @@ def dashboard():
     individual student marks, and submission status.
     Only accessible to team leaders.
     """
-    teams = Team.get_by_team_lead(current_user.id)  # Use the new method
+    teams = Team.get_by_team_lead(current_user.id)  
     templates = []
     deadlines = []
     student_marks = {}
-    submission_status = "Not Submitted"  # Default status
+    submission_status = "Not Submitted"  
     submissions = []
     announcements = []
-    project = None  # Initialize project as None by default
+    project = None  
 
-    if teams:  # Check if teams is not empty
+    if teams:  
         faculty_id = teams[0]['faculty_id'] 
         deadlines = Deadline.get_all(faculty_id)
         templates = TemplateFile.get_all(faculty_id)
         announcements = Announcement.get_all(faculty_id)
         
-        # Get project submission status
         project = Project.get_by_team_lead_roll_no(TeamLeader.get(current_user.id)['roll_no'])
         if project:
             submission_status = "Submitted"
         
-        # Calculate marks for each student in the team
         for team in teams:
             submissions = Submission.get_by_team_id(team['_id'])
     else:
@@ -382,7 +213,7 @@ def project_details(project_id):
     teams = Team.get_teams_by_student(current_user.id)
     project = Project.get_by_id(project_id)
     # if project and current_user.id == project.get('team_lead_id'): 
-    #      # Only team leader can view
+    
     submissions = []
     for team in teams:
             submissions = Submission.get_by_team_id(team['_id'])

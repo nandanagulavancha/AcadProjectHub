@@ -45,13 +45,12 @@ def dashboard():
 def create_team_and_leaders():
     if request.method == 'POST':
         name = request.form['name']
-
         roll_no = request.form['roll_no_1']
         leader_name = request.form['name_1']
         branch = request.form['branch_1']
         section = request.form['section_1']
         email = request.form['email_1']
-        username = request.form['username_1']  # Added
+        username = request.form['username_1']
 
         # Generate a temporary password
         temp_password = generate_temporary_password()
@@ -59,12 +58,21 @@ def create_team_and_leaders():
         # Create the TeamLeader
         team_leader_id = TeamLeader.create(roll_no, leader_name, branch, section, email, username, temp_password)
 
-        if team_leader_id:
-            Team.create(name, team_leader_id, current_user.id, roll_no)
-            flash(f'Team "{name}" and leader "{leader_name}" created. Credentials sent to {email}.', 'success')
-            return redirect(url_for('faculty.dashboard'))
-        else:
-            flash('Error creating team leader.', 'danger')
+        if team_leader_id is None:
+            flash('A team leader with this email, username, or roll number already exists.', 'error')
+            return redirect(url_for('faculty.create_team_and_leaders'))
+
+        # Create the Team
+        team_id = Team.create(name, team_leader_id, current_user.id, roll_no)
+        
+        if team_id is None:
+            # If team creation fails due to duplicate, we need to delete the team leader we just created
+            TeamLeader.delete(team_leader_id)
+            flash('A team with this name already exists for your faculty.', 'error')
+            return redirect(url_for('faculty.create_team_and_leaders'))
+        
+        flash(f'Team "{name}" and leader "{leader_name}" created. Credentials sent to {email}.', 'success')
+        return redirect(url_for('faculty.dashboard'))
 
     return render_template('create_team_and_leaders.html')
 
@@ -111,25 +119,12 @@ def faculty_project_details(team_id):
     # print(team)
     project = Project.get_by_team_lead_roll_no(team["team_lead_roll"])
     submissions = Submission.get_by_team_id(team_id)
-    # print(submissions)  # Fetch submissions for the team
+    # print(submissions)  
     print(submissions,"nnn")
     return render_template('faculty_project_details.html', project=project, team_id=team_id, submissions=submissions) # Pass team_id to template
 
 
 
-# @faculty_bp.route('/team/<team_id>')
-# @login_required
-# def team_details(team_id):
-#     team = Team.get(team_id)
-#     if not team:
-#         flash('Team not found.', 'error')
-#         return redirect(url_for('faculty_bp.some_faculty_route')) # Redirect to a relevant faculty page
-
-#     submissions = Submission.get_all(team_id)
-#     leaders = TeamLeader.get_all_by_team(team_id)
-#     project = mongo.db.projects.find_one({'team_id': ObjectId(team_id)}) # Fetch project details
-#     return render_template('team_details.html', team=team, submissions=submissions, leaders=leaders, project=project)
-# faculty.py
 @faculty_bp.route('/team/<team_id>/give_marks', methods=['GET', 'POST'])
 @login_required
 def give_marks(team_id):
@@ -297,22 +292,22 @@ def download_zip(zip_file_id):
         A Flask Response object containing the file, or a redirect with an error.
     """
     print(f"download_zip called with zip_file_id: {zip_file_id}, type: {type(zip_file_id)}")
-    project = Project.get_by_id(zip_file_id)  # Use Project.get to retrieve project
+    project = Project.get_by_id(zip_file_id) 
     if project:
-        filepath = project['zip_file_id'] # Access the zip_file_id from the project
-        filename = os.path.basename(filepath)  # Get the filename from the filepath
+        filepath = project['zip_file_id'] 
+        filename = os.path.basename(filepath)  
         print(f"Attempting to download zip file from: {filepath}")
         if os.path.exists(filepath):
             with open(filepath, 'rb') as f:
                 file_content = f.read()
             return Response(
                 file_content,
-                mimetype='application/zip',  # Set the correct mimetype for zip files
+                mimetype='application/zip',  
                 headers={'Content-Disposition': f'attachment; filename={filename}'}
             )
         else:
             flash('Zip file not found on server.', 'error')
-            return redirect(url_for('faculty.dashboard'))  # Or appropriate faculty route
+            return redirect(url_for('faculty.dashboard'))  
     else:
         flash('Project record not found.', 'error')
-        return redirect(url_for('faculty.dashboard'))  # Or appropriate faculty route
+        return redirect(url_for('faculty.dashboard')) 

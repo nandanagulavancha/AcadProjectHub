@@ -9,13 +9,12 @@ from flask_login import LoginManager
 from models import User, TeamLeader
 from werkzeug.security import generate_password_hash
 
-# Explicitly set the template folder
 template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../templates')
 
 app = Flask(__name__, template_folder=template_folder, static_folder='student_uploads', static_url_path='/uploads/student')
 
-# Configuration
-app.config['SECRET_KEY'] = '112233445566778899'  # Replace with a strong secret key
+
+app.config['SECRET_KEY'] = '112233445566778899'  
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -25,19 +24,15 @@ app.config['MAIL_DEFAULT_SENDER'] = 'nanda190506@gmail.com'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'student_uploads')
 
-# Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Initialize database
 init_db(app)
 
-# Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(student_bp, url_prefix='/student')
 app.register_blueprint(faculty_bp, url_prefix='/faculty')
 app.register_blueprint(admin_bp, url_prefix='/admin')
 
-# Initialize login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login'
